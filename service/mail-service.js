@@ -43,13 +43,14 @@ const sendActivationMail = async (to, link) => {
     await emailTransporter.sendMail({
         from: process.env.SMTP_USER,
         to,
-        subject: 'Активация аккаунта на ' + process.env.API_URL,
+        subject: 'Активация аккаунта MSSP Global ',
         text: '',
         html:
         `
         <div>
-            <h1>Для активации аккаунта перейдите по ссылке</h1>
+            <h1>Для активации аккаунта перейдите по ссылке:</h1>
             <a href="${link}">${link}</a>
+            <p>С уважением, команда MSSP Global</p>
         </div>
         `
     })

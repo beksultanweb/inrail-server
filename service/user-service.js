@@ -9,7 +9,8 @@ const ApiError = require('../exceptions/api-error')
 const tokenModel = require('../models/token-model')
 
 class UserService {
-    async registration(email, password) {
+    async registration(email, password, firsName, secondName, roles) {
+        if(!email || !password) throw ApiError.BadRequest('Email и пароль обязательны для заполнения')
         const candidate = await UserModel.findOne({email})
         if(candidate) {
             throw ApiError.BadRequest('Пользователь с таким почтовым адресом уже существует')
@@ -17,8 +18,8 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 3)
         const activationLink = uuid.v4()
 
-        const user = await UserModel.create({email, password: hashPassword, activationLink})
-        await sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`)
+        const user = await UserModel.create({email, password: hashPassword, roles: roles, firsName, secondName, activationLink})
+        // await sendActivationMail(email, `${process.env.CLIENT_URL}/api/activate/${activationLink}`)
 
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
@@ -80,6 +81,7 @@ class UserService {
         if(!isPassEquals) {
             throw ApiError.BadRequest('Неверный пароль')
         }
+
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
 
@@ -93,7 +95,7 @@ class UserService {
     }
 
     async refresh(refreshToken) {
-        if(refreshToken) {
+        if(!refreshToken) {
             throw ApiError.UnauthorizedError()
         }
         const userData = tokenService.validateRefreshToken(refreshToken)
@@ -102,6 +104,7 @@ class UserService {
             throw ApiError.UnauthorizedError()
         }
         const user = await UserModel.findById(userData.id)
+
         const userDto = new UserDto(user)
         const tokens = tokenService.generateTokens({...userDto})
 
@@ -109,9 +112,9 @@ class UserService {
         return {...tokens, user: userDto}
     }
 
-    async getAllUsers() {
-        const users = await UserModel.find()
-        return users
+    async getUserInfo(userId) {
+        const user = await UserModel.findById(userId)
+        return user
     }
 }
 
