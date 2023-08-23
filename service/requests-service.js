@@ -1,7 +1,7 @@
 const RequestModel = require('../models/request-model')
 const path = require('path')
 const fs = require('fs').promises;
-const carrierModel = require('../models/carrier-model')
+const infoModel = require('../models/info-model')
 
 class RequestService {
     async getMyRequests(userId) {
@@ -17,7 +17,7 @@ class RequestService {
         return request
     }
 
-    async setCarrierInfo(userId, companyName, address, phone, logo, contactName, BIN) {
+    async setInfo(userId, companyName, address, phone, logo, contactName, BIN) {
         try {
             const dirPath = path.join(__dirname, '..', `logos/${userId}`);
     
@@ -27,7 +27,6 @@ class RequestService {
                     const filePath = path.join(dirPath, file);
                     try {
                         await fs.unlink(filePath);
-                        console.log(`${file} deleted successfully.`);
                     } catch (unlinkErr) {
                         console.error(`Error deleting ${file}:`, unlinkErr);
                     }
@@ -43,7 +42,7 @@ class RequestService {
                 });
             });
 
-            const request = await carrierModel.findOneAndUpdate(
+            const request = await infoModel.findOneAndUpdate(
                 { user: userId },
                 { companyName, address, phone, contactName, BIN, logo: Object.keys(logo) },
                 { upsert: true, new: true }

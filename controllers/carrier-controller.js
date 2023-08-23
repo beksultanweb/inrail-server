@@ -4,7 +4,7 @@ const { validationResult } = require('express-validator')
 const ApiError = require('../exceptions/api-error')
 const path = require('path')
 
-class AdminController {
+class CarrierController {
     async getAllRequests(req, res, next) {
         try {
             const requests = await RequestService.getAllRequests()
@@ -63,4 +63,4 @@ class AdminController {
     }
 }
 
-module.exports = new AdminController()
+module.exports = new CarrierController()

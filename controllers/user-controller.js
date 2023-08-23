@@ -1,6 +1,10 @@
 const userService = require('../service/user-service')
 const { validationResult } = require('express-validator')
 const ApiError = require('../exceptions/api-error')
+const fs = require('fs').promises
+const path = require('path')
+const infoModel = require('../models/info-model')
+const requestsService = require('../service/requests-service')
 
 class UserController {
     async registration(req, res, next) {
@@ -74,6 +78,51 @@ class UserController {
             const userData = await userService.refresh(refreshToken)
             res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
             return res.json(userData)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async setInfo(req, res, next) {
+        try {
+            const { userId, companyName, BIN, address, contactName, phone } = req.body
+            const logo = req.files
+            const request = await requestsService.setInfo(userId, companyName, address, phone, logo, contactName, BIN)
+            return res.json({status: 'success', message: request})
+        } catch (error) {
+            next(error)
+        }
+    }
+    async getLogo(req, res, next) {
+        const userId = req.params.userId
+
+        const dirPath = path.join(__dirname, '..', `logos/${userId}`);
+
+        try {
+            const files = await fs.readdir(dirPath);
+            await Promise.all(files.map(async file => {
+                const filePath = path.join(dirPath, file);
+                try {
+                    res.sendFile(filePath)
+                } catch (unlinkErr) {
+                    console.error(`Error downloading ${file}:`, unlinkErr);
+                }
+            }));
+        } catch (err) {
+            next(err);
+        }
+    }
+    async getInfo(req, res, next) {
+        try {
+            const userId = req.params.userId
+
+            const carrier = await infoModel.findOne({ user: userId });
+
+            if (!carrier) {
+                return null;
+            }
+
+            return res.json(carrier);
         } catch (error) {
             next(error)
         }
