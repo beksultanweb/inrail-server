@@ -9,7 +9,8 @@ const RequestSchema = new Schema({
     capacity: {type: Number},
     wagon_numbers: {type: Number},
     cargo_type: {type: String},
-    wagon_type: {type: String}
+    wagon_type: {type: String},
+    carrier: {type: String}
 })
 
 module.exports = model('Request', RequestSchema)

@@ -3,6 +3,7 @@ const UserService = require('../service/user-service')
 const { validationResult } = require('express-validator')
 const ApiError = require('../exceptions/api-error')
 const path = require('path')
+const priceModel = require('../models/price-model')
 
 class CarrierController {
     async getAllRequests(req, res, next) {
@@ -22,41 +23,24 @@ class CarrierController {
             next(error)
         }
     }
-    async updateStatus(req, res, next) {
+    async setPrice(req, res, next) {
         try {
-            const requestId = req.params.requestId
-            const {status} = req.body
-            const request = await RequestService.updateStatus(requestId, status)
-            return res.json(request)
+            const { userId, requestId, price } = req.body
+            await priceModel.findOneAndUpdate(
+                { user: userId, request: requestId },
+                { request: requestId, price },
+                { upsert: true, new: true }
+            )
+            return res.json({ price, request: requestId })
         } catch (error) {
             next(error)
         }
     }
-    async download(req, res, next) {
+    async getMyPrices(req, res, next) {
         try {
-            const requestId = req.query.requestId
-            const fileName = req.query.fileName
-
-            const filePath = path.join(__dirname, '..', `files/${requestId}/${fileName}`)
-
-            res.download(filePath, fileName, (err) => {
-                if(err) {
-                    console.log(err)
-                    return res.status(404).json({status: 'error', message: err})
-                }
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async uploadFiles(req, res, next) {
-        try {
-            const requestId = req.params.requestId
-            const files = req.files
-            const request = await RequestService.uploadFiles(requestId, files)
-            return res.json({status: 'success', message: request})
+            const userId = req.params.userId
+            const prices = await priceModel.find({user: userId})
+            return res.json(prices)
         } catch (error) {
             next(error)
         }
