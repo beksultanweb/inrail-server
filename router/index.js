@@ -34,7 +34,7 @@ router.get('/myprices/:userId', verifyRoles(ROLES_LIST.Carrier), carrierControll
 router.get('/requests/:userId', verifyRoles(ROLES_LIST.Shipper), shipperController.getRequests)
 router.get('/getprices/:requestId', verifyRoles(ROLES_LIST.Shipper), shipperController.getRequestPrices)
 router.post('/choosecarrier', verifyRoles(ROLES_LIST.Shipper), shipperController.setChoosePriceandCarrier)
-router.post('/requests', verifyRoles(ROLES_LIST.Admin), authMiddleware, shipperController.createRequest)
+router.post('/requests', verifyRoles(ROLES_LIST.Shipper), authMiddleware, shipperController.createRequest)
 router.post('/user-info', fileUpload({createParentPath: true}), filePayloadExitst, fileExtLimiter(['.png', '.jpg', '.jpeg']), fileSizeLimiter, verifyRoles(ROLES_LIST.Shipper, ROLES_LIST.Carrier), userController.setInfo)
 router.get('/getmyinfo/:userId', verifyRoles(ROLES_LIST.Shipper, ROLES_LIST.Carrier), userController.getInfo)
 router.get('/getmylogo/:userId', verifyRoles(ROLES_LIST.Shipper, ROLES_LIST.Carrier), userController.getLogo)

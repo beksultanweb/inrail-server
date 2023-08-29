@@ -118,8 +118,8 @@ class UserController {
 
             const carrier = await infoModel.findOne({ user: userId });
 
-            if (!carrier) {
-                return null;
+            if (carrier === null) {
+                throw ApiError.BadRequest('Заполните свой профайл!');
             }
 
             return res.json(carrier);

@@ -11,7 +11,8 @@ const RequestSchema = new Schema({
     cargo_type: {type: String},
     wagon_type: {type: String},
     carrier: {type: String},
-    price: {type: String}
+    price: {type: String},
+    counter: {type: Number}
 })
 
 module.exports = model('Request', RequestSchema)

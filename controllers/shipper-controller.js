@@ -29,7 +29,13 @@ class ShipperController {
         try {
             const { departure, destination, weight, capacity, wagon_numbers, cargo_type, wagon_type } = req.body.values
             const userId = req.user.id
-            const request = RequestModel.create({user: userId, departure: departure, destination: destination, date: new Date(), weight: weight, capacity: capacity, wagon_numbers: wagon_numbers, cargo_type: cargo_type, wagon_type: wagon_type})
+
+            const highestCounterRequest = await RequestModel.findOne().sort('-counter').exec();
+            let counterValue = 1;
+            if (highestCounterRequest.counter) {
+                counterValue = highestCounterRequest.counter + 1;
+            }
+            const request = RequestModel.create({user: userId, departure: departure, destination: destination, date: new Date(), weight: weight, capacity: capacity, wagon_numbers: wagon_numbers, cargo_type: cargo_type, wagon_type: wagon_type, counter: counterValue})
             return res.json(request)
         } catch (error) {
             next(error)
