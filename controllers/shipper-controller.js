@@ -59,8 +59,8 @@ class ShipperController {
     }
     async setChoosePriceandCarrier(req, res, next) {
         try {
-            const {requestId, userId} = req.body
-            const updatedRequest = await RequestModel.findByIdAndUpdate(requestId, { carrier: userId });
+            const {requestId, price, userId} = req.body
+            const updatedRequest = await RequestModel.findByIdAndUpdate(requestId, { carrier: userId, price: price });
             return res.json({message: 'Перевозчик выбран', data: updatedRequest})
         } catch (error) {
             next(error)
